@@ -12,6 +12,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:usesCleartextTraffic="true"
         android:theme="@style/Theme.QuickBug">
         <activity android:name=".qrCheck"/>
         <uses-library
@@ -28,5 +29,5 @@
             android:name="com.naver.maps.map.CLIENT_ID"
             android:value="wf96v6nadc" />
     </application>
-
+    <uses-permission android:name="android.permission.INTERNET"></uses-permission>
 </manifest>
