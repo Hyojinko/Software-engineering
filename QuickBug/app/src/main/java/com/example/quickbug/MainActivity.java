@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.location.Geocoder;
 import android.media.Image;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.util.Log;
 import android.view.View;
 import android.webkit.WebView;
@@ -31,11 +32,14 @@ import com.naver.maps.map.overlay.Marker;
 import com.naver.maps.map.util.FusedLocationSource;
 
 import org.w3c.dom.Text;
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.lang.reflect.Array;
+import java.net.URL;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
-
+    TextView seoulweather;
     String[] items = {"IT 융합대학","글로벌센터","예술대학/공과대학","대학원","바이오나노연구원","비전타워/법대/공대2","산학협력관","가천관","교육대학원","중앙도서관","학생회관","기숙사"};
     private static final String TAG = "MainActivity";
     private MapView mapView;
@@ -52,6 +56,81 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mapView = findViewById(R.id.map_view);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
+
+        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                .detectDiskReads().detectDiskWrites().detectNetwork()
+                .penaltyLog().build());
+
+        seoulweather = (TextView) findViewById(R.id.seoulweather);
+        String Item = "";
+        try {
+            URL url = new URL(
+                    "http://www.kma.go.kr/XML/weather/sfc_web_map.xml");
+            XmlPullParserFactory factory = XmlPullParserFactory
+                    .newInstance();
+
+            XmlPullParser parser = factory.newPullParser();
+            parser.setInput(url.openStream(), "utf-8");
+
+            String ItemName = "";
+            String ItemContents = "";
+            String badstate1 = "소나기";
+            String badstate2 = "비";
+            String badstate3 = "눈";
+            String badstate4 = "비 또는 눈";
+            String badstate5 = "눈 또는 비";
+            String badstate6 = "천둥번개";
+
+
+            boolean bSet = false;
+            int eventType = parser.getEventType();
+            while (eventType != XmlPullParser.END_DOCUMENT) {
+                switch (eventType) {
+                    case XmlPullParser.START_DOCUMENT:
+                        break;
+                    case XmlPullParser.END_DOCUMENT:
+                        break;
+                    case XmlPullParser.START_TAG:
+                        String tag = parser.getName();
+                        if (tag.equals("local")) {
+                            ItemContents = "";
+                            String state = parser.getAttributeValue(null,
+                                    "desc");
+                            String temperature = "섭씨 ";
+                            temperature += parser.getAttributeValue(null,
+                                    "ta");
+                            temperature += "º";
+                            ItemContents = "운행중" + " / " + state + " , " + temperature
+                                    + "  ";
+
+                            if (state.equals(badstate1) || state.equals(badstate2) || state.equals(badstate3) ||
+                                    state.equals(badstate4) || state.equals(badstate5) || state.equals(badstate6)) {
+                                ItemContents = "운행 중단" + " / " + state + " , " + temperature
+                                        + "  ";
+                            }
+                            bSet = true;
+                        }
+                        break;
+                    case XmlPullParser.END_TAG:
+                        break;
+                    case XmlPullParser.TEXT:
+                        if (bSet) {
+                            ItemName = "";
+                            String region = parser.getText();
+                            ItemName += region + "   - ";
+                            if(region.equals("서울")){
+                                Item = ItemContents;
+                                Item += "\n";
+                                bSet = false;
+                            }
+                        }
+                        break;
+                }
+                eventType = parser.next();
+            }
+            seoulweather.setText(Item);
+        } catch (Exception e) {
+        }
 
         locationSource = new FusedLocationSource(this, LOCATION_PERMISSION_REQUEST_CODE);
 
