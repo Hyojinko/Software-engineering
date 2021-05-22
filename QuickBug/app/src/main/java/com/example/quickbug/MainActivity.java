@@ -20,12 +20,15 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.naver.maps.geometry.LatLng;
+import com.naver.maps.map.CameraPosition;
 import com.naver.maps.map.CameraUpdate;
 import com.naver.maps.map.LocationTrackingMode;
 import com.naver.maps.map.MapView;
 import com.naver.maps.map.NaverMap;
+import com.naver.maps.map.NaverMapOptions;
 import com.naver.maps.map.OnMapReadyCallback;
 import com.naver.maps.map.overlay.InfoWindow;
 import com.naver.maps.map.overlay.Marker;
@@ -40,6 +43,8 @@ import java.net.URL;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
     TextView seoulweather;
+    EditText idEdit;
+    EditText nameEdit;
     String[] items = {"IT 융합대학","글로벌센터","예술대학/공과대학","대학원","바이오나노연구원","비전타워/법대/공대2","산학협력관","가천관","교육대학원","중앙도서관","학생회관","기숙사"};
     private static final String TAG = "MainActivity";
     private MapView mapView;
@@ -54,6 +59,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mapView = findViewById(R.id.map_view);
+        idEdit = (EditText) findViewById(R.id.studentnumber);
+        nameEdit = (EditText) findViewById(R.id.studentname);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
         CameraPosition cameraPosition = new CameraPosition(new LatLng(37.45087165240168, 127.12888504524742),16,20,0);
@@ -62,6 +69,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
                 .detectDiskReads().detectDiskWrites().detectNetwork()
                 .penaltyLog().build());
+
+        Intent myIntent = new Intent(this, qrCheck.class);
 
         seoulweather = (TextView) findViewById(R.id.seoulweather);
         String Item = "";
@@ -186,7 +195,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         qr.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                String name = nameEdit.getText().toString();
+                String id = idEdit.getText().toString();
+
                 Intent intent = new Intent(MainActivity.this, qrCheck.class);
+
+                intent.putExtra("name", name);
+                intent.putExtra("id", id);
+
                 startActivity(intent);
             }
         });

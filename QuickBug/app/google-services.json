@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "642377875481",
+    "project_id": "quickbug-e0729",
+    "storage_bucket": "quickbug-e0729.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:642377875481:android:cc429dbfdeecdee0b92a88",
+        "android_client_info": {
+          "package_name": "com.example.quickbug"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "642377875481-tjvo2df36ptiu8e5hfj9j2trp3dfjrkl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAPlhMmTM1Lxe0uYbSjKCo0CP4und5cLZg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "642377875481-tjvo2df36ptiu8e5hfj9j2trp3dfjrkl.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
