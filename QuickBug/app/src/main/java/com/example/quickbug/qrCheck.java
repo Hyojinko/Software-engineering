@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -25,8 +26,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class qrCheck extends AppCompatActivity {
+
     private IntentIntegrator qrScan;
     private DatabaseReference mDatabase;
+    TextView textView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,9 +49,11 @@ public class qrCheck extends AppCompatActivity {
         String name = intent.getStringExtra("name");
         String id = intent.getStringExtra("id");
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+        textView = findViewById(R.id.textView);
         if(result != null) {
             if(result.getContents() == null) {
                 Toast.makeText(this, "스캔 취소", Toast.LENGTH_LONG).show();
+
                 // todo
             } else {
                 long now = System.currentTimeMillis();
@@ -64,12 +70,11 @@ public class qrCheck extends AppCompatActivity {
 
                 myRef.setValue(getTime + " " + name +" "+ location);
 
-                Toast.makeText(this, "대기자 추가 완료" + result.getContents(), Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "대기자 추가 완료", Toast.LENGTH_LONG).show();
+                textView.setText("QR 스캔 완료");
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
-
-
 }
