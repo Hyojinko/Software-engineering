@@ -17,6 +17,7 @@
         android:usesCleartextTraffic="true"
         android:theme="@style/Theme.QuickBug">
         <activity android:name=".qrCheck"/>
+        <activity android:name=".managerActivity"/>
         <activity android:name=".popupActivity" android:theme="@android:style/Theme.Dialog"/>
         <uses-library
             android:name="com.google.android.maps"
