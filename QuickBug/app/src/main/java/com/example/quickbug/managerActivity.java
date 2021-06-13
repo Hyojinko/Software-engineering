@@ -15,6 +15,12 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 public class managerActivity extends AppCompatActivity {
 
     EditText mngAth;
@@ -41,21 +47,28 @@ public class managerActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 int code = Integer.parseInt(mngAth.getText().toString());
+                String id = "manager";
+                FirebaseDatabase database = FirebaseDatabase.getInstance();
+                DatabaseReference myRef = database.getReference(id);
 
                 if(code == AUTHENTICATION_CODE){
 
                     if(radioStop.isChecked()){
                         //Check '운행 중단'
+                        myRef.setValue("stop");
 
                         Log.i("check","stop");
+
+
                     }
                     if(radioRun.isChecked()) {
                         //Check '운행 중'
 
+                        myRef.setValue("run");
+                        
                         Log.i("check","run");
                     }
 
-                    //인증코드 맞으면 수정 후 main activity로
                     Toast.makeText(getApplicationContext(), "수정되었습니다", Toast.LENGTH_LONG).show();
                     Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                     startActivity(intent);
