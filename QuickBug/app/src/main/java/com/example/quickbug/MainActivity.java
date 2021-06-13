@@ -104,21 +104,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         int intHour = Integer.parseInt(time1.substring(0,2));
         boolean stop;
 
-        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = mDatabase.getReference("manager");
-
-        myRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                value = dataSnapshot.getValue(String.class);
-                Toast.makeText(getApplicationContext(), value, Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onCancelled(DatabaseError error) {
-            }
-        });
-
         if(intHour>=9 && intHour<=17){
             stop = false; }
         else stop = true; //운행x
@@ -131,7 +116,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         else hday = false;
 
         try {
-            Toast.makeText(getApplicationContext(), value+"1", Toast.LENGTH_LONG).show();
             URL url = new URL(
                     "http://www.kma.go.kr/XML/weather/sfc_web_map.xml");
             XmlPullParserFactory factory = XmlPullParserFactory
@@ -207,6 +191,24 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             seoulweather.setText(Item);
         } catch (Exception e) {
         }
+
+        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+        DatabaseReference myRef = mDatabase.getReference("manager");
+
+        myRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                value = dataSnapshot.getValue(String.class);
+
+                if(value!= null) {
+                    seoulweather.setText("관리자 수정: " + value);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+            }
+        });
 
         locationSource = new FusedLocationSource(this, LOCATION_PERMISSION_REQUEST_CODE);
 
