@@ -1,41 +1,36 @@
 package com.example.quickbug;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
-import android.media.Image;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.Toolbar;
 
-import org.w3c.dom.Text;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;
 
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.lang.reflect.Array;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Scanner;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.naver.maps.geometry.LatLng;
 import com.naver.maps.map.CameraPosition;
 import com.naver.maps.map.LocationTrackingMode;
@@ -50,6 +45,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     String[] items = {"IT 융합대학","글로벌센터","예술대학/공과대학","대학원","바이오나노연구원","비전타워/법대/공대2","산학협력관","가천관","교육대학원","중앙도서관","학생회관","기숙사"};
     private static final String TAG = "MainActivity";
+    public String value;
     private MapView mapView;
     private static final int LOCATION_PERMISSION_REQUEST_CODE=1000;
     private FusedLocationSource locationSource;
@@ -64,11 +60,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     int hour;
     int minute;
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        
+
+
         idEdit = (EditText) findViewById(R.id.studentnumber);
         nameEdit = (EditText) findViewById(R.id.studentname);
 
@@ -103,10 +102,26 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
         int intHour = Integer.parseInt(time1.substring(0,2));
-        boolean running;
+        boolean stop;
+
+        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+        DatabaseReference myRef = mDatabase.getReference("manager");
+
+        myRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                value = dataSnapshot.getValue(String.class);
+                Toast.makeText(getApplicationContext(), value, Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+            }
+        });
+
         if(intHour>=9 && intHour<=17){
-            running = false; }
-        else running = true; //운행x
+            stop = false; }
+        else stop = true; //운행x
 
         Calendar cal = Calendar.getInstance();
         int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
@@ -115,9 +130,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             hday = true; } //운행x
         else hday = false;
 
-
-
         try {
+            Toast.makeText(getApplicationContext(), value+"1", Toast.LENGTH_LONG).show();
             URL url = new URL(
                     "http://www.kma.go.kr/XML/weather/sfc_web_map.xml");
             XmlPullParserFactory factory = XmlPullParserFactory
@@ -145,7 +159,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         break;
                     case XmlPullParser.START_TAG:
                         String tag = parser.getName();
-                        if (tag.equals("local")) {
+                        if (tag.equals("local") || value == "run") {
                             ItemContents = "";
                             String state = parser.getAttributeValue(null,
                                     "desc");
@@ -158,11 +172,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             ItemContents = "운행중" + " / " + state + " , " + temperature
                                     + "  ";
 
-                            if(running || hday){
+                            if(stop || hday){
                                 ItemContents = "운행 시간 X" + " / " + state + " , " + temperature + "  ";
                             }
 
-                            if (state.equals(badstate1) || state.equals(badstate2) || state.equals(badstate3) ||
+                            if (value == "stop" || state.equals(badstate1) || state.equals(badstate2) || state.equals(badstate3) ||
                                     state.equals(badstate4) || state.equals(badstate5) || state.equals(badstate6)) {
                                 ItemContents = "운행 중단" + " / " + state + " , " + temperature
                                         + "  ";
