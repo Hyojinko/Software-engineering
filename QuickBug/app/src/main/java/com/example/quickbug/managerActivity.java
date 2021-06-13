@@ -21,6 +21,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class managerActivity extends AppCompatActivity {
 
     EditText mngAth;
@@ -50,22 +53,35 @@ public class managerActivity extends AppCompatActivity {
                 String id = "manager";
                 FirebaseDatabase database = FirebaseDatabase.getInstance();
                 DatabaseReference myRef = database.getReference(id);
+                DatabaseReference timeRef = database.getReference("time");
+
+                Date from = new Date();
+                SimpleDateFormat nowDate = new SimpleDateFormat("yyyyMMddHHmmss");
+                String nowTime = nowDate.format(from);
+                String nowHour = nowTime.substring(8,10);
+                String nowMinute = nowTime.substring(10,12);
+                String nowSecond = nowTime.substring(12);
+
 
                 if(code == AUTHENTICATION_CODE){
 
                     if(radioStop.isChecked()){
                         //Check '운행 중단'
-                        myRef.setValue("stop");
+                        myRef.setValue("운행 중단");
+                        timeRef.setValue(nowTime);
 
                         Log.i("check","stop");
+
+
 
 
                     }
                     if(radioRun.isChecked()) {
                         //Check '운행 중'
 
-                        myRef.setValue("run");
-                        
+                        myRef.setValue("운행 중");
+                        timeRef.setValue(nowTime);
+
                         Log.i("check","run");
                     }
 
