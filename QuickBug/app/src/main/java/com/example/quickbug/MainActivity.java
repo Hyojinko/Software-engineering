@@ -194,14 +194,66 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
         DatabaseReference myRef = mDatabase.getReference("manager");
+        DatabaseReference timeRef = mDatabase.getReference("time");
 
-        myRef.addValueEventListener(new ValueEventListener() {
+        timeRef.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                value = dataSnapshot.getValue(String.class);
+            public void onDataChange( DataSnapshot snapshot) {
+                String mtime = snapshot.getValue(String.class); //데이터베이스에서 가져온 매니저의 운행정보 수정 시각
 
-                if(value!= null) {
-                    seoulweather.setText("관리자 수정: " + value);
+                if(mtime!= null) {
+                    String mMonth = mtime.substring(4,6);
+                    String mDay = mtime.substring(6,8);
+                    String mHour = mtime.substring(8,10);
+
+                    Date from = new Date();
+                    SimpleDateFormat nowDate = new SimpleDateFormat("yyyyMMddHHmmss");
+                    String nowTime = nowDate.format(from);
+                    String nowMonth = nowTime.substring(4,6);
+                    String nowDay = nowTime.substring(6,8);
+                    String nowHour = nowTime.substring(8,10);
+
+                    int nowMonthint = Integer.parseInt(nowMonth);
+                    int mMonthint = Integer.parseInt(mMonth);
+                    int nowDayint = Integer.parseInt(nowDay);
+                    int mDayint = Integer.parseInt(mDay);
+                    int nowHourint = Integer.parseInt(nowHour);
+                    int mHourint = Integer.parseInt(mHour)+3;
+
+                    if(nowMonthint == mMonthint && nowDayint == mDayint && mHourint > nowHourint){ //날짜가 같고 시간이 지나지 않았을 경우
+                        myRef.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                value = dataSnapshot.getValue(String.class);
+
+                                if(value!= null) {
+                                    seoulweather.setText("관리자 수정: " + value);
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError error) {
+                            }
+                        });
+
+                    }
+
+                    if(nowMonthint == mMonthint && nowDayint == mDayint+1 && mHourint-24 > nowHourint) { //날짜가 하루 지났고 시간이 지나지 않았을 경우
+                        myRef.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                value = dataSnapshot.getValue(String.class);
+
+                                if(value!= null) {
+                                    seoulweather.setText("관리자 수정: " + value);
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError error) {
+                            }
+                        });
+                    }
                 }
             }
 
